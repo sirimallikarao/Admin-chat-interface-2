@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obsidian Technology Chatbot</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0a;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #0a0a0a 0%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: linear-gradient(90deg,
+                    #ff00ff 0%,
+                    #00ff00 50%,
+                    #00ffff 100%);
+            animation: rotate 10s linear infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-box {
+            background: rgba(30, 30, 30, 0.95);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.1);
+            width: 24rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-placeholder {
+            width: 8rem;
+            height: 8rem;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-placeholder::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-placeholder span {
+            position: relative;
+            z-index: 2;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .login-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            gap: 0.75rem;
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.875rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            outline: none;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #ff00ff;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(90deg, #ff00ff 0%, #00ffff 100%);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+
+        .chat-container {
+            display: none;
+            min-height: 100vh;
+            background: #0a0a0a;
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            margin: 1rem;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: rgba(30, 30, 30, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-header-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-logo {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-logo::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: #1a1a1a;
+            border-radius: 50%;
+        }
+
+        .chat-logo span {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            font-size: 0.75rem;
+        }
+
+        .chat-title {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .clear-chat-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid rgba(255, 0, 255, 0.2);
+            color: #ff00ff;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .clear-chat-btn:hover {
+            background: rgba(255, 0, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+        }
+
+        .messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user .message-content {
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+
+        .bot .message-content {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-area {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem;
+            background: rgba(30, 30, 30, 0.95);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-btn {
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #00ffff;
+            transition: all 0.3s ease;
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .send-btn {
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            border-radius: 4px;
+        }
+
+        ::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <div class="logo-placeholder">
+                <span>Logo Space</span>
+            </div>
+            <div class="login-header">
+                <i data-lucide="lock" class="text-fuchsia-500"></i>
+                <h1>Admin Login</h1>
+            </div>
+            <input type="password" id="adminPassword" placeholder="Enter admin password" class="input-field">
+            <button onclick="handleLogin()" class="btn">Login</button>
+        </div>
+    </div>
+
+    <div id="chatContainer" class="chat-container">
+        <div class="main-chat">
+            <div class="chat-header">
+                <div class="chat-header-logo">
+                    <div class="chat-logo">
+                        <span>Logo</span>
+                    </div>
+                    <h1 class="chat-title">Obsidian Chat</h1>
+                </div>
+                <button class="clear-chat-btn" onclick="clearChat()">
+                    <i data-lucide="trash-2"></i>
+                    Clear Chat
+                </button>
+            </div>
+            <div id="messages" class="messages"></div>
+            <div class="input-area">
+                <div class="input-group">
+                    <div id="micBtn" class="icon-btn" onclick="toggleRecording()">
+                        <i data-lucide="mic"></i>
+                    </div>
+                    <div id="pauseBtn" class="icon-btn" onclick="togglePause()" style="display: none;">
+                        <i data-lucide="pause"></i>
+                    </div>
+                    <input type="text" id="messageInput" placeholder="Type your message..." class="input-field"
+                        onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <div class="send-btn" onclick="sendMessage()">
+                        <i data-lucide="send"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="page.js"></script>
+</body>
+
+</html>
